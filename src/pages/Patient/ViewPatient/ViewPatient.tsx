@@ -39,41 +39,110 @@ export default function ViewPatient() {
 
   return (
       <ComponentCard title="View Patient">
-          <div className="flex flex-wrap gap-4">
+  <div className="flex flex-wrap gap-4">
 
-              <div className="w-full sm:w-1/2 lg:w-1/3">
-                  <p><strong>First Name:</strong> {patients?.firstname}</p>
-              </div>
+    {/* Basic Info */}
+    <div className="w-full">
+      <h3 className="font-semibold text-lg">Basic Information</h3>
+    </div>
 
-              <div className="w-full sm:w-1/2 lg:w-1/3">
-                  <p><strong>Last Name:</strong> {patients?.lastname}</p>
-              </div>
+    <div className="w-full sm:w-1/2 lg:w-1/3">
+      <p><strong>First Name:</strong> {patients?.firstname}</p>
+    </div>
 
-              <div className="w-full sm:w-1/2 lg:w-1/3">
-                  <p><strong>Gender:</strong> {patients?.gender}</p>
-              </div>
+    <div className="w-full sm:w-1/2 lg:w-1/3">
+      <p><strong>Last Name:</strong> {patients?.lastname}</p>
+    </div>
 
-              <div className="w-full sm:w-1/2 lg:w-1/3">
-                  <p><strong>Status:</strong> {patients?.status}</p>
-              </div>
+    <div className="w-full sm:w-1/2 lg:w-1/3">
+      <p><strong>Gender:</strong> {patients?.gender}</p>
+    </div>
 
-              <div className="w-full sm:w-1/2 lg:w-1/3">
-                  <p><strong>Phone:</strong> {patients?.contact?.phone}</p>
-              </div>
+    <div className="w-full sm:w-1/2 lg:w-1/3">
+      <p><strong>Date Of Birth:</strong> {patients?.dateOfBirth}</p>
+    </div>
 
-              <div className="w-full sm:w-1/2 lg:w-1/3">
-                  <p><strong>Email:</strong> {patients?.contact?.email}</p>
-              </div>
+    <div className="w-full sm:w-1/2 lg:w-1/3">
+      <p><strong>Age:</strong> {patients?.age}</p>
+    </div>
 
-              <div className="w-full sm:w-1/2 lg:w-1/3">
-                  <p><strong>CNIC:</strong> {patients?.cnic}</p>
-              </div>
+    <div className="w-full sm:w-1/2 lg:w-1/3">
+      <p><strong>CNIC:</strong> {patients?.cnic}</p>
+    </div>
 
-              <div className="w-full sm:w-1/2 lg:w-1/3">
-                  <p><strong>Age:</strong> {patients?.age}</p>
-              </div>
+    {/* Contact Info */}
+    <div className="w-full">
+      <h3 className="font-semibold text-lg mt-4">Contact Information</h3>
+    </div>
 
-          </div>
-      </ComponentCard>
+    <div className="w-full sm:w-1/2 lg:w-1/3">
+      <p><strong>Phone:</strong> {patients?.contact?.phone}</p>
+    </div>
+
+    <div className="w-full sm:w-1/2 lg:w-1/3">
+      <p><strong>Email:</strong> {patients?.contact?.email}</p>
+    </div>
+
+    <div className="w-full sm:w-1/2 lg:w-1/3">
+      <p><strong>Address:</strong> {patients?.contact?.address}</p>
+    </div>
+
+    {/* Medical Info */}
+    <div className="w-full">
+      <h3 className="font-semibold text-lg mt-4">Medical Information</h3>
+    </div>
+
+    <div className="w-full sm:w-1/2 lg:w-1/3">
+      <p><strong>Blood Group:</strong> {patients?.medical?.bloodGroup}</p>
+    </div>
+
+    <div className="w-full sm:w-1/2 lg:w-1/3">
+      <p><strong>Allergies:</strong> {patients?.medical?.allergies}</p>
+    </div>
+
+    <div className="w-full sm:w-1/2 lg:w-1/3">
+      <p><strong>Diseases:</strong> {patients?.medical?.diseases}</p>
+    </div>
+
+    {/* Emergency Info */}
+    <div className="w-full">
+      <h3 className="font-semibold text-lg mt-4">Emergency Contact</h3>
+    </div>
+
+    <div className="w-full sm:w-1/2 lg:w-1/3">
+      <p><strong>Name:</strong> {patients?.emergency?.emergencyName}</p>
+    </div>
+
+    <div className="w-full sm:w-1/2 lg:w-1/3">
+      <p><strong>Phone:</strong> {patients?.emergency?.emergencyNumber}</p>
+    </div>
+
+    <div className="w-full sm:w-1/2 lg:w-1/3">
+      <p><strong>Marital Status:</strong> {patients?.emergency?.maritalStatus}</p>
+    </div>
+
+    {/* Registration Info */}
+    <div className="w-full">
+      <h3 className="font-semibold text-lg mt-4">Registration Info</h3>
+    </div>
+
+    <div className="w-full sm:w-1/2 lg:w-1/3">
+      <p><strong>Department:</strong> {patients?.registration?.department}</p>
+    </div>
+
+    <div className="w-full sm:w-1/2 lg:w-1/3">
+      <p><strong>patient Type:</strong> {patients?.registration?.patientType}</p>
+    </div>
+
+    <div className="w-full sm:w-1/2 lg:w-1/3">
+      <p><strong>Registration Date:</strong> {patients?.registration?.registerDate}</p>
+    </div>
+
+    <div className="w-full sm:w-1/2 lg:w-1/3">
+      <p><strong>Doctor Assigned:</strong> {patients?.registration?.assignedDoctor}</p>
+    </div>
+
+  </div>
+</ComponentCard>
   )
 }
