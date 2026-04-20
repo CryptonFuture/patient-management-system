@@ -18,6 +18,11 @@ import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
+import Patient from "./pages/Patient/Patient";
+import Auth from "./pages/Authentication/Auth";
+import AddPatient from "./pages/Patient/AddPatient/AddPatient";
+import UpdatePatient from "./pages/Patient/UpdatePatient/UpdatePatient";
+import ViewPatient from "./pages/Patient/ViewPatient/ViewPatient";
 
 export default function App() {
   return (
@@ -28,6 +33,11 @@ export default function App() {
           {/* Dashboard Layout */}
           <Route element={<AppLayout />}>
             <Route index path="/" element={<Home />} />
+            <Route index path="/patient" element={<Patient />} />
+            <Route index path="/auth" element={<Auth />} />
+            <Route path="/add-patient" element={<AddPatient />} />
+            <Route path="/edit-patient/:id" element={<UpdatePatient />} />
+            <Route path="/view-patient/:id" element={<ViewPatient />} />
 
             {/* Others Page */}
             <Route path="/profile" element={<UserProfiles />} />
