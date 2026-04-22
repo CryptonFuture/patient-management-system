@@ -23,6 +23,7 @@ import Auth from "./pages/Authentication/Auth";
 import AddPatient from "./pages/Patient/AddPatient/AddPatient";
 import UpdatePatient from "./pages/Patient/UpdatePatient/UpdatePatient";
 import ViewPatient from "./pages/Patient/ViewPatient/ViewPatient";
+import Doctor from "./pages/Doctor/Doctor";
 
 export default function App() {
   return (
@@ -38,6 +39,9 @@ export default function App() {
             <Route path="/add-patient" element={<AddPatient />} />
             <Route path="/edit-patient/:id" element={<UpdatePatient />} />
             <Route path="/view-patient/:id" element={<ViewPatient />} />
+
+            <Route index path="/doctor" element={<Doctor />} />
+
 
             {/* Others Page */}
             <Route path="/profile" element={<UserProfiles />} />
