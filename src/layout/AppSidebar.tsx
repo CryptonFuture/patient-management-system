@@ -48,7 +48,7 @@ const navItems: NavItem[] = [
     icon: <CalenderIcon />,
     name: "Doctor",
     subItems: [
-      { name: "List Doctor", path: "/list-doctor", pro: false },
+      { name: "List Doctor", path: "/doctor", pro: false },
       { name: "Assign patients to doctors", path: "/assign-patient", pro: false },
       { name: "Manage doctor schedules", path: "/manage-doctor", pro: false },
     ],
