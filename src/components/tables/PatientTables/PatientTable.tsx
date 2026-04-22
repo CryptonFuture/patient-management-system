@@ -125,12 +125,25 @@ export default function PatientTable({ search, setSearch }: { search: string, se
   const [data, setData] = useState<any[]>([])
   const [toast, setToast] = useState<{ message: string; type: string } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  // const [sortField, setSortField] = useState<string>('');
+  // const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [pageSize, setPageSize] = useState(5);
   const [jumpPage, setJumpPage] = useState('');
 
   const itemsPerPage = 5;
 
   // const { id } = useParams()
+
+//   const handleSort = (field: string) => {
+//   if (sortField === field) {
+//     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+//   } else {
+//     setSortField(field);
+//     setSortOrder('asc');
+//   }
+// };
+
+
 
   const filteredData = data?.filter((patient: any) =>
     `${patient.firstname} ${patient.lastname}`
@@ -139,6 +152,31 @@ export default function PatientTable({ search, setSearch }: { search: string, se
     patient.contact?.phone?.toLowerCase().includes(search.toLowerCase()) ||
     patient.contact?.email?.toLowerCase().includes(search.toLowerCase())
   );
+
+//   const sortedData = [...filteredData].sort((a: any, b: any) => {
+//   if (!sortField) return 0;
+
+//   let aValue = '';
+//   let bValue = '';
+
+//   if (sortField === 'name') {
+//     aValue = `${a.firstname} ${a.lastname}`.toLowerCase();
+//     bValue = `${b.firstname} ${b.lastname}`.toLowerCase();
+//   } else if (sortField === 'phone') {
+//     aValue = a.contact?.phone || '';
+//     bValue = b.contact?.phone || '';
+//   } else if (sortField === 'email') {
+//     aValue = a.contact?.email || '';
+//     bValue = b.contact?.email || '';
+//   } else {
+//     aValue = a[sortField];
+//     bValue = b[sortField];
+//   }
+
+//   if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+//   if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+//   return 0;
+// });
 
   const totalPages = Math.ceil(filteredData.length / pageSize);
 
@@ -207,13 +245,9 @@ export default function PatientTable({ search, setSearch }: { search: string, se
   }, [search])
   return (
     <>
-
-
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
-
         <div className="w-full overflow-x-hidden">
           <div style={{ maxHeight: '350px', overflow: 'scrollY' }}>
-
             <Table className='w-full table-fixed'>
               {/* Table Header */}
               <TableHeader className="border-b">
@@ -262,7 +296,7 @@ export default function PatientTable({ search, setSearch }: { search: string, se
 
                 </TableRow>
               </TableHeader>
-
+              
               {/* Table Body */}
               <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                 {paginatedData && paginatedData.length > 0 ? (
@@ -470,14 +504,17 @@ export default function PatientTable({ search, setSearch }: { search: string, se
         </div>
 
       </div> */}
-      {toast && (
-        <div
-          className={`fixed bottom-10 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg text-white transition-all
-                ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}
-        >
-          {toast.message}
-        </div>
-      )}
+      <div
+        className={`fixed bottom-10 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-300 ease-in-out
+    ${toast
+            ? "opacity-100 translate-y-0 scale-100"
+            : "opacity-0 translate-y-5 scale-95 pointer-events-none"
+          }
+    ${toast?.type === "success" ? "bg-green-600" : "bg-red-600"}
+  `}
+      >
+        {toast?.message}
+      </div>
 
     </>
   )

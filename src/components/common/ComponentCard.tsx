@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { Link, useLocation } from 'react-router'
 import { Funnel } from "lucide-react"; // 👈 icon import
+import { Search, X } from "lucide-react";
 
 interface ComponentCardProps {
   title: string;
@@ -23,6 +24,8 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
 }) => {
 
    const location = useLocation();
+
+   const [showSearch, setShowSearch] = useState(false);
   
   // ✅ Check if current page is Add Patient form
   const isAddPatientPage = location.pathname === '/add-patient' ||
@@ -49,18 +52,30 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
         </div>
 
         {/* RIGHT SIDE → Search + Button */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1">
 
-          {/* SEARCH */}
+          {/* TOGGLE BUTTON */}
+          <button
+            onClick={() => setShowSearch(!showSearch)}
+            className="p-2 border  rounded-md text-gray-600 hover:bg-gray-100 transition"
+          >
+            {showSearch ? <X size={18} /> : <Search size={18} />}
+          </button>
+
+          {/* SEARCH (always mounted) */}
           {search !== undefined && setSearch && (
-            <div className="relative w-full md:w-64">
-
+            <div
+              className={`relative  overflow-hidden transition-all duration-300 ease-in-out ${showSearch
+                  ? "w-64 opacity-100 scale-100"
+                  : "w-0 opacity-0 scale-95"
+                }`}
+            >
               <input
                 type="text"
                 placeholder="Search by name, phone or email..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full px-3 py-2 pr-8 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                 className="w-full px-3  py-2 pr-8 border rounded-md outline-none focus:outline-none focus:ring-0"
               />
 
               {/* CLEAR BUTTON */}
@@ -72,17 +87,8 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
                   ×
                 </button>
               )}
-
             </div>
           )}
-
-          {/* FILTER ICON */}
-          
-          {/* <button
-            className="p-2 border rounded-md text-gray-600 hover:bg-gray-100 hover:text-black transition"
-          >
-            <Funnel size={18} />
-          </button> */}
 
           {/* BUTTON */}
           {!isAddPatientPage && (
