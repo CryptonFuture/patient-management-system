@@ -26,6 +26,8 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
    const location = useLocation();
 
    const [showSearch, setShowSearch] = useState(false);
+
+   const [mode, setMode] = useState("list");
   
   // ✅ Check if current page is Add Patient form
   const isAddPatientPage = location.pathname === '/add-patient' ||
@@ -55,39 +57,43 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
         <div className="flex items-center gap-1">
 
           {/* TOGGLE BUTTON */}
-          <button
-            onClick={() => setShowSearch(!showSearch)}
-            className="p-2 border  rounded-md text-gray-600 hover:bg-gray-100 transition"
-          >
-            {showSearch ? <X size={18} /> : <Search size={18} />}
-          </button>
+          {!isAddPatientPage && (
+            <>
+              <button
+                onClick={() => setShowSearch(!showSearch)}
+                className="p-2 border  rounded-md text-gray-600 hover:bg-gray-100 transition"
+              >
+                {showSearch ? <X size={18} /> : <Search size={18} />}
+              </button>
 
-          {/* SEARCH (always mounted) */}
-          {search !== undefined && setSearch && (
-            <div
-              className={`relative  overflow-hidden transition-all duration-300 ease-in-out ${showSearch
-                  ? "w-64 opacity-100 scale-100"
-                  : "w-0 opacity-0 scale-95"
-                }`}
-            >
-              <input
-                type="text"
-                placeholder="Search by name, phone or email..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                 className="w-full px-3  py-2 pr-8 border rounded-md outline-none focus:outline-none focus:ring-0"
-              />
-
-              {/* CLEAR BUTTON */}
-              {search && (
-                <button
-                  onClick={() => setSearch('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-500 text-lg"
+              {/* SEARCH (always mounted) */}
+              {search !== undefined && setSearch && (
+                <div
+                  className={`relative  overflow-hidden transition-all duration-300 ease-in-out ${showSearch
+                    ? "w-64 opacity-100 scale-100"
+                    : "w-0 opacity-0 scale-95"
+                    }`}
                 >
-                  ×
-                </button>
+                  <input
+                    type="text"
+                    placeholder="Search by name, phone or email..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full px-3  py-2 pr-8 border rounded-md outline-none focus:outline-none focus:ring-0"
+                  />
+
+                  {/* CLEAR BUTTON */}
+                  {search && (
+                    <button
+                      onClick={() => setSearch('')}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-500 text-lg"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
               )}
-            </div>
+            </>
           )}
 
           {/* BUTTON */}

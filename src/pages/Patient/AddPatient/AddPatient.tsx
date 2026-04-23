@@ -8,9 +8,24 @@ import DatePicker from "../../../components/form/date-picker.tsx";
 import { addPatient, getGender } from '../../../utils/Services/patient.tsx';
 import { useNavigate } from 'react-router'
 
+type Patient = {
+  firstname?: string;
+  lastname?: string;
+  gender?: string;
+  dateOfBirth?: string;
+  cnic?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+};
+
+type PatientErrors = {
+  [key in keyof Patient]?: string;
+};
+
 export default function AddPatient() {
     const [toast, setToast] = useState<{ message: string; type: string } | null>(null);
-
+    const [errors, setErrors] = useState<PatientErrors>({});
     const [gender, setGender] = useState<any[]>([])
 
     const navigate = useNavigate()
@@ -45,7 +60,7 @@ export default function AddPatient() {
         registerDate: ""
     })
 
-    const handOnChangeInput = (e: any) => {
+    const handOnChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
         setPatient({ ...patient, [name]: value })
     }
@@ -62,9 +77,24 @@ export default function AddPatient() {
         setPatient({ ...patient, country: value });
     };
 
+    const validate = (): boolean => {
+        const newErrors: PatientErrors = {};
+
+        if (!patient.firstname) newErrors.firstname = "first name is required";
+        if (!patient.lastname) newErrors.lastname = "last name is required";
+        if (!patient.cnic) newErrors.cnic = "cnic is required";
+        if (!patient.phone) newErrors.phone = "phone is required";
+        if (!patient.email) newErrors.email = "email is required";
+
+        setErrors(newErrors);
+
+        return Object.keys(newErrors).length === 0;
+    };
+
 
     const handleOnSubmit = async () => {
         try {
+            if (!validate()) return;
             const payload = {
                 firstname: patient.firstname,
                 lastname: patient.lastname,
@@ -172,12 +202,33 @@ export default function AddPatient() {
 
                 <div>
                     <Label htmlFor="input">First Name</Label>
-                    <Input name='firstname' onChange={handOnChangeInput} type="text" id="input" />
+                    <Input 
+                        name='firstname' 
+                        onChange={handOnChangeInput}
+                        type="text" 
+                        id="input" 
+                         placeholder='Enter a firstname'
+                         className={errors.firstname ? "border-red-500" : ""}
+                        />
+
+                    {errors.firstname && (
+                        <p className="text-red-500 text-sm">{errors.firstname}</p>
+                    )}
                 </div>
 
                 <div>
                     <Label htmlFor="input">Last Name</Label>
-                    <Input name='lastname' onChange={handOnChangeInput} type="text" id="input" />
+                    <Input 
+                    name='lastname' 
+                    onChange={handOnChangeInput} 
+                    type="text" 
+                    id="input" 
+                    placeholder='Enter a lastname'
+                    className={errors.lastname ? "border-red-500" : ""}
+                    />
+                      {errors.lastname && (
+                        <p className="text-red-500 text-sm">{errors.lastname}</p>
+                    )}
                 </div>
 
                 <div>
@@ -206,14 +257,30 @@ export default function AddPatient() {
 
                 <div>
                     <Label htmlFor="input">Cnic</Label>
-                    <Input name='cnic' onChange={handOnChangeInput} type="text" id="input" />
+                    <Input 
+                    name='cnic' 
+                    onChange={handOnChangeInput} 
+                    type="text" 
+                    id="input" 
+                    placeholder='Enter a cnic'
+                    className={errors.cnic ? "border-red-500" : ""}
+                    />
+                    {errors.cnic && (
+                        <p className="text-red-500 text-sm">{errors.cnic}</p>
+                    )}
                 </div>
 
 
 
                 <div>
                     <Label htmlFor="input">Age</Label>
-                    <Input name='age' onChange={handOnChangeInput} type="text" id="input" />
+                    <Input 
+                    name='age' 
+                    onChange={handOnChangeInput} 
+                    type="text" 
+                    id="input" 
+                    placeholder='Enter a age'
+                    />
                 </div>
 
 
@@ -227,22 +294,42 @@ export default function AddPatient() {
 
                 <div>
                     <Label htmlFor="input">Phone No</Label>
-                    <Input name='phone' onChange={handOnChangeInput} type="text" id="input" />
+                    <Input 
+                    name='phone' 
+                    onChange={handOnChangeInput} 
+                    type="text" 
+                    id="input" 
+                    placeholder='Enter a phone'
+                    className={errors.phone ? "border-red-500" : ""}
+                    />
+                     {errors.phone && (
+                        <p className="text-red-500 text-sm">{errors.phone}</p>
+                    )}
                 </div>
 
                 <div>
                     <Label htmlFor="input">Alternate No</Label>
-                    <Input name='alternatePhone' onChange={handOnChangeInput} type="text" id="input" />
+                    <Input  placeholder='Enter a alternate number' name='alternatePhone' onChange={handOnChangeInput} type="text" id="input" />
                 </div>
 
                 <div>
                     <Label htmlFor="inputTwo">Email Address</Label>
-                    <Input name='email' onChange={handOnChangeInput} type="text" id="inputTwo" placeholder="info@gmail.com" />
+                    <Input 
+                    name='email' 
+                    onChange={handOnChangeInput} 
+                    type="text" 
+                    id="inputTwo"
+                    placeholder="info@gmail.com" 
+                    className={errors.email ? "border-red-500" : ""}
+                     />
+                      {errors.phone && (
+                        <p className="text-red-500 text-sm">{errors.email}</p>
+                    )}
                 </div>
 
                 <div>
                     <Label htmlFor="input">Address</Label>
-                    <Input name='address' onChange={handOnChangeInput} type="text" id="input" />
+                    <Input placeholder='Enter a address' name='address' onChange={handOnChangeInput} type="text" id="input" />
                 </div>
 
                 <div>
@@ -277,32 +364,32 @@ export default function AddPatient() {
 
                 <div>
                     <Label>Blood Group</Label>
-                    <Input onChange={handOnChangeInput} name="bloodGroup" type="text" />
+                    <Input placeholder='Enter a blood group' onChange={handOnChangeInput} name="bloodGroup" type="text" />
                 </div>
 
                 <div>
                     <Label>Height (cm)</Label>
-                    <Input onChange={handOnChangeInput} name="height" type="number" />
+                    <Input placeholder='Enter a height' onChange={handOnChangeInput} name="height" type="number" />
                 </div>
 
                 <div>
                     <Label>Weight (kg)</Label>
-                    <Input onChange={handOnChangeInput} name="weight" type="number" />
+                    <Input placeholder='Enter a weight' onChange={handOnChangeInput} name="weight" type="number" />
                 </div>
 
                 <div>
                     <Label>Allergies</Label>
-                    <Input onChange={handOnChangeInput} name="allergies" type="text" />
+                    <Input placeholder='Enter a allergies' onChange={handOnChangeInput} name="allergies" type="text" />
                 </div>
 
                 <div>
                     <Label>Chronic Diseases</Label>
-                    <Input onChange={handOnChangeInput} name="diseases" type="text" />
+                    <Input placeholder='Enter a diseases' onChange={handOnChangeInput} name="diseases" type="text" />
                 </div>
 
                 <div>
                     <Label>Current Medications</Label>
-                    <Input onChange={handOnChangeInput} name="medications" type="text" />
+                    <Input placeholder='Enter a medications' onChange={handOnChangeInput} name="medications" type="text" />
                 </div>
 
                 {/* <div>
@@ -331,17 +418,17 @@ export default function AddPatient() {
                         }
                         className="dark:bg-dark-900"
                     /> */}
-                    <Input onChange={handOnChangeInput} name="patientType" type="text" />
+                    <Input placeholder='Enter a patient type' onChange={handOnChangeInput} name="patientType" type="text" />
                 </div>
 
                 <div>
                     <Label>Department</Label>
-                    <Input name="department" onChange={handOnChangeInput} type="text" />
+                    <Input placeholder='Enter a department' name="department" onChange={handOnChangeInput} type="text" />
                 </div>
 
                 <div>
                     <Label>Assigned Doctor</Label>
-                    <Input name="assignedDoctor" onChange={handOnChangeInput} type="text" />
+                    <Input placeholder='Enter a assigned doctor' name="assignedDoctor" onChange={handOnChangeInput} type="text" />
                 </div>
 
                 <div>
@@ -369,6 +456,7 @@ export default function AddPatient() {
                         onChange={handOnChangeInput}
                         name="emergencyName"
                         type="text"
+                        placeholder='Enter a emergency name'
                     />
                 </div>
 
@@ -378,6 +466,8 @@ export default function AddPatient() {
                         onChange={handOnChangeInput}
                         name="emergencyNumber"
                         type="text"
+                        placeholder='Enter a emergency number'
+
                     />
                 </div>
 
@@ -387,6 +477,7 @@ export default function AddPatient() {
                         onChange={handOnChangeInput}
                         name="insuranceProvider"
                         type="text"
+                        placeholder='Enter a insurance provider'
                     />
                 </div>
 
@@ -396,6 +487,7 @@ export default function AddPatient() {
                         name='maritalStatus'
                         onChange={handOnChangeInput}
                         type="text"
+                        placeholder='Enter a marital status'
                     />
                 </div>
 
@@ -405,6 +497,7 @@ export default function AddPatient() {
                         onChange={handOnChangeInput}
                         name="occupation"
                         type="text"
+                        placeholder='Enter a occupation'
                     />
                 </div>
 

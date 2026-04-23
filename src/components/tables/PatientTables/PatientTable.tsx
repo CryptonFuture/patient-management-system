@@ -203,10 +203,10 @@ export default function PatientTable({ search, setSearch }: { search: string, se
           type: "error",
         });
       } else {
-        setToast({
-          message: message || "Patients loaded successfully",
-          type: "success",
-        });
+        // setToast({
+        //   message: message || "Patients loaded successfully",
+        //   type: "success",
+        // });
       }
 
       setTimeout(() => {
