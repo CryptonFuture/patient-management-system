@@ -14,8 +14,25 @@ type ToggleProps = {
   onChange: () => void;
 };
 
+type Patient = {
+  firstname?: string;
+  lastname?: string;
+  gender?: string;
+  dateOfBirth?: string;
+  cnic?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+};
+
+type PatientErrors = {
+  [key in keyof Patient]?: string;
+};
+
 export default function UpdatePatient() {
     const [toast, setToast] = useState<{ message: string; type: string } | null>(null);
+    const [errors, setErrors] = useState<PatientErrors>({});
+    
     const normalize = (val: string) => val?.trim().toLowerCase();
     const navigate = useNavigate()
     const { id } = useParams()
@@ -71,8 +88,6 @@ export default function UpdatePatient() {
 
     const [gender, setGender] = useState<any[]>([])
 
-   
-
 
     const handOnChangeInput = (e: any) => {
         const { name, value } = e.target
@@ -85,6 +100,20 @@ export default function UpdatePatient() {
             status: !prev?.status
         }));
  
+    };
+
+     const validate = (): boolean => {
+        const newErrors: PatientErrors = {};
+
+        if (!patient.firstname) newErrors.firstname = "first name is required";
+        if (!patient.lastname) newErrors.lastname = "last name is required";
+        if (!patient.cnic) newErrors.cnic = "cnic is required";
+        if (!patient.phone) newErrors.phone = "phone is required";
+        if (!patient.email) newErrors.email = "email is required";
+
+        setErrors(newErrors);
+
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleOnStatusContactSelectChange = () => {
@@ -198,6 +227,7 @@ export default function UpdatePatient() {
 
     const handleOnSubmit = async () => {
         try {
+            if (!validate()) return;
             const payload = {
                 firstname: patient.firstname,
                 lastname: patient.lastname,
@@ -440,12 +470,18 @@ export default function UpdatePatient() {
 
                 <div>
                     <Label htmlFor="input">First Name</Label>
-                    <Input value={patient?.firstname || ''} name='firstname' onChange={handOnChangeInput} type="text" id="input" />
+                    <Input className={errors.firstname ? "border-red-500" : ""} placeholder='Enter a firstname' value={patient?.firstname || ''} name='firstname' onChange={handOnChangeInput} type="text" id="input" />
+                  {errors.firstname && (
+                        <p className="text-red-500 text-sm">{errors.firstname}</p>
+                    )}
                 </div>
 
                 <div>
                     <Label htmlFor="input">Last Name</Label>
-                    <Input value={patient?.lastname || ''} name='lastname' onChange={handOnChangeInput} type="text" id="input" />
+                    <Input className={errors.lastname ? "border-red-500" : ""} placeholder='Enter a lastname' value={patient?.lastname || ''} name='lastname' onChange={handOnChangeInput} type="text" id="input" />
+                  {errors.lastname && (
+                        <p className="text-red-500 text-sm">{errors.lastname}</p>
+                    )}
                 </div>
 
                 <div>
@@ -480,14 +516,17 @@ export default function UpdatePatient() {
 
                 <div>
                     <Label htmlFor="input">Cnic</Label>
-                    <Input value={patient?.cnic || ''} name='cnic' onChange={handOnChangeInput} type="text" id="input" />
+                    <Input className={errors.cnic ? "border-red-500" : ""} placeholder='Enter a cnic' value={patient?.cnic || ''} name='cnic' onChange={handOnChangeInput} type="text" id="input" />
+                    {errors.cnic && (
+                            <p className="text-red-500 text-sm">{errors.cnic}</p>
+                    )}
                 </div>
 
 
 
                 <div>
                     <Label htmlFor="input">Age</Label>
-                    <Input value={patient?.age || ''} name='age' onChange={handOnChangeInput} type="text" id="input" />
+                    <Input placeholder='Enter a age' value={patient?.age || ''} name='age' onChange={handOnChangeInput} type="text" id="input" />
                 </div>
                 
                 {/* <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
@@ -517,22 +556,28 @@ export default function UpdatePatient() {
 
                 <div>
                     <Label htmlFor="input">Phone No</Label>
-                    <Input value={patient?.contact?.phone || ''} name='phone' onChange={handleContactChange} type="text" id="input" />
+                    <Input className={errors.phone ? "border-red-500" : ""} placeholder='Enter a phone' value={patient?.contact?.phone || ''} name='phone' onChange={handleContactChange} type="text" id="input" />
+                  {errors.phone && (
+                        <p className="text-red-500 text-sm">{errors.phone}</p>
+                    )}
                 </div>
 
                 <div>
                     <Label htmlFor="input">Alternate No</Label>
-                    <Input value={patient?.contact?.alternatePhone || ''} name='alternatePhone' onChange={handleContactChange} type="text" id="input" />
+                    <Input placeholder='Enter a alternate number' value={patient?.contact?.alternatePhone || ''} name='alternatePhone' onChange={handleContactChange} type="text" id="input" />
                 </div>
 
                 <div>
                     <Label htmlFor="inputTwo">Email Address</Label>
-                    <Input value={patient?.contact?.email || ''} name='email' onChange={handleContactChange} type="text" id="inputTwo" placeholder="info@gmail.com" />
+                    <Input className={errors.email ? "border-red-500" : ""} placeholder='Enter a email' value={patient?.contact?.email || ''} name='email' onChange={handleContactChange} type="text" id="inputTwo" />
+                    {errors.email && (
+                        <p className="text-red-500 text-sm">{errors.email}</p>
+                    )}
                 </div>
 
                 <div>
                     <Label htmlFor="input">Address</Label>
-                    <Input value={patient?.contact?.address || ''} name='address' onChange={handleContactChange} type="text" id="input" />
+                    <Input placeholder='Enter a address' value={patient?.contact?.address || ''} name='address' onChange={handleContactChange} type="text" id="input" />
                 </div>
 
                 <div>
@@ -584,32 +629,32 @@ export default function UpdatePatient() {
 
                 <div>
                     <Label>Blood Group</Label>
-                    <Input value={patient?.medical?.bloodGroup || ''} onChange={handleMedicalChange} name="bloodGroup" type="text" />
+                    <Input placeholder='Enter a blood group' value={patient?.medical?.bloodGroup || ''} onChange={handleMedicalChange} name="bloodGroup" type="text" />
                 </div>
 
                 <div>
                     <Label>Height (cm)</Label>
-                    <Input value={patient?.medical?.height || ''} onChange={handleMedicalChange} name="height" type="number" />
+                    <Input placeholder='Enter a height' value={patient?.medical?.height || ''} onChange={handleMedicalChange} name="height" type="number" />
                 </div>
 
                 <div>
                     <Label>Weight (kg)</Label>
-                    <Input value={patient?.medical?.weight || ''} onChange={handleMedicalChange} name="weight" type="number" />
+                    <Input placeholder='Enter a weight' value={patient?.medical?.weight || ''} onChange={handleMedicalChange} name="weight" type="number" />
                 </div>
 
                 <div>
                     <Label>Allergies</Label>
-                    <Input value={patient?.medical?.allergies || ''} onChange={handleMedicalChange} name="allergies" type="text" />
+                    <Input placeholder='Enter a allergies' value={patient?.medical?.allergies || ''} onChange={handleMedicalChange} name="allergies" type="text" />
                 </div>
 
                 <div>
                     <Label>Chronic Diseases</Label>
-                    <Input value={patient?.medical?.diseases || ''} onChange={handleMedicalChange} name="diseases" type="text" />
+                    <Input placeholder='Enter a diseases' value={patient?.medical?.diseases || ''} onChange={handleMedicalChange} name="diseases" type="text" />
                 </div>
 
                 <div>
                     <Label>Current Medications</Label>
-                    <Input value={patient?.medical?.medications || ''} onChange={handleMedicalChange} name="medications" type="text" />
+                    <Input placeholder='Enter a medications' value={patient?.medical?.medications || ''} onChange={handleMedicalChange} name="medications" type="text" />
                 </div>
 
                 {/* <div>
@@ -638,17 +683,17 @@ export default function UpdatePatient() {
                         }
                         className="dark:bg-dark-900"
                     /> */}
-                    <Input value={patient?.registration?.patientType || ''} onChange={handleRegistrationChange} name="patientType" type="text" />
+                    <Input placeholder='Enter a patient type' value={patient?.registration?.patientType || ''} onChange={handleRegistrationChange} name="patientType" type="text" />
                 </div>
 
                 <div>
                     <Label>Department</Label>
-                    <Input value={patient?.registration?.department || ''} name="department" onChange={handleRegistrationChange} type="text" />
+                    <Input placeholder='Enter a department' value={patient?.registration?.department || ''} name="department" onChange={handleRegistrationChange} type="text" />
                 </div>
 
                 <div>
                     <Label>Assigned Doctor</Label>
-                    <Input value={patient?.registration?.assignedDoctor || ''} name="assignedDoctor" onChange={handleRegistrationChange} type="text" />
+                    <Input placeholder='Enter a assigned doctor' value={patient?.registration?.assignedDoctor || ''} name="assignedDoctor" onChange={handleRegistrationChange} type="text" />
                 </div>
 
                 <div>
@@ -687,6 +732,7 @@ export default function UpdatePatient() {
                         onChange={handleEmergencyChange}
                         name="emergencyName"
                         type="text"
+                        placeholder='Enter a emergency name'
                     />
                 </div>
 
@@ -697,6 +743,7 @@ export default function UpdatePatient() {
                         onChange={handleEmergencyChange}
                         name="emergencyNumber"
                         type="text"
+                        placeholder='Enter a emergency number'
                     />
                 </div>
 
@@ -707,6 +754,7 @@ export default function UpdatePatient() {
                         onChange={handleEmergencyChange}
                         name="insuranceProvider"
                         type="text"
+                        placeholder='Enter a insurance provider'
                     />
                 </div>
 
@@ -717,6 +765,7 @@ export default function UpdatePatient() {
                         name='maritalStatus'
                         onChange={handleEmergencyChange}
                         type="text"
+                        placeholder='Enter a marital status'
                     />
                 </div>
 
@@ -727,6 +776,7 @@ export default function UpdatePatient() {
                         onChange={handleEmergencyChange}
                         name="occupation"
                         type="text"
+                        placeholder='Enter a occupation'
                     />
                 </div>
 
