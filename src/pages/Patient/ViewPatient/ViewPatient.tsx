@@ -2,40 +2,19 @@ import React, { useState, useEffect } from 'react'
 import ComponentCard from '../../../components/common/ComponentCard'
 import { viewPatient } from '../../../utils/Services/patient';
 import { useParams } from 'react-router';
+import { useGetPatientByIdQuery } from '../../../utils/RTKQuery/Patients/ApiPatients';
 
 export default function ViewPatient() {
-    const [patients, setPatients] = useState<any>({})
+    const { id }: any = useParams()
+    const { data, error, isLoading } = useGetPatientByIdQuery(id);
 
-    const { id } = useParams()
+    if (isLoading) return <p>Loading...</p>;
+    if (error) return <p>Error loading patient</p>;
 
-    const patient = {
-        id: 11,
-        firstname: "tested",
-        lastname: "test",
-        gender: "male",
-        maritalStatus: "single",
-        address: "nk",
-        dateOfBirth: "2026-04-08",
-        cnic: "42101-6123833-9",
-        phone: "03222382819",
-        email: "apr003@gmail.com",
-        age: 37,
-        status: "Active",
-        createdAt: "2026-04-09T11:36:45.704Z"
-    };
+    const patient = data?.data || data; 
 
-    const fetchViewPatient = async () => {
-        const res = await viewPatient(id)
-        console.log(res);
-
-        setPatients(res)
-    }
-
-    useEffect(() => {
-        if (id) {
-            fetchViewPatient()
-        }
-    }, [id])
+    if (isLoading) return <p>Loading...</p>;
+    if (error) return <p>Error loading patient</p>;
 
     return (
         <ComponentCard title="View Patient">
@@ -50,32 +29,32 @@ export default function ViewPatient() {
 
                 <div>
                     <p className="text-gray-900 font-normal">First Name</p>
-                    <p>{patients?.firstname}</p>
+                    <p>{patient?.firstname}</p>
                 </div>
 
                 <div>
                     <p className="text-gray-900 font-normal">Last Name</p>
-                    <p>{patients?.lastname}</p>
+                    <p>{patient?.lastname}</p>
                 </div>
 
                 <div>
                     <p className="text-gray-900 font-normal">Gender</p>
-                    <p>{patients?.gender}</p>
+                    <p>{patient?.gender}</p>
                 </div>
 
                 <div>
                     <p className="text-gray-900 font-normal">Date Of Birth</p>
-                    <p>{patients?.dateOfBirth}</p>
+                    <p>{patient?.dateOfBirth}</p>
                 </div>
 
                 <div>
                     <p className="text-gray-900 font-normal">Age</p>
-                    <p>{patients?.age}</p>
+                    <p>{patient?.age}</p>
                 </div>
 
                 <div>
                     <p className="text-gray-900 font-normal">CNIC</p>
-                    <p>{patients?.cnic}</p>
+                    <p>{patient?.cnic}</p>
                 </div>
 
                 {/* Contact Info */}
@@ -87,17 +66,17 @@ export default function ViewPatient() {
 
                 <div>
                     <p className="text-gray-900 font-normal">Phone</p>
-                    <p>{patients?.contact?.phone}</p>
+                    <p>{patient?.contact?.phone}</p>
                 </div>
 
                 <div>
                     <p className="text-gray-900 font-normal">Email</p>
-                    <p>{patients?.contact?.email}</p>
+                    <p>{patient?.contact?.email}</p>
                 </div>
 
                 <div>
                     <p className="text-gray-900 font-normal">Address</p>
-                    <p>{patients?.contact?.address}</p>
+                    <p>{patient?.contact?.address}</p>
                 </div>
 
                 {/* Medical Info */}
@@ -109,17 +88,17 @@ export default function ViewPatient() {
 
                 <div>
                     <p className="text-gray-900 font-normal">Blood Group</p>
-                    <p>{patients?.medical?.bloodGroup}</p>
+                    <p>{patient?.medical?.bloodGroup}</p>
                 </div>
 
                 <div>
                     <p className="text-gray-900 font-normal">Allergies</p>
-                    <p>{patients?.medical?.allergies}</p>
+                    <p>{patient?.medical?.allergies}</p>
                 </div>
 
                 <div>
                     <p className="text-gray-900 font-normal">Diseases</p>
-                    <p>{patients?.medical?.diseases}</p>
+                    <p>{patient?.medical?.diseases}</p>
                 </div>
 
                 {/* Emergency Info */}
@@ -131,17 +110,17 @@ export default function ViewPatient() {
 
                 <div>
                     <p className="text-gray-900 font-normal">Name</p>
-                    <p>{patients?.emergency?.emergencyName}</p>
+                    <p>{patient?.emergency?.emergencyName}</p>
                 </div>
 
                 <div>
                     <p className="text-gray-900 font-normal">Phone</p>
-                    <p>{patients?.emergency?.emergencyNumber}</p>
+                    <p>{patient?.emergency?.emergencyNumber}</p>
                 </div>
 
                 <div>
                     <p className="text-gray-900 font-normal">Marital Status</p>
-                    <p>{patients?.emergency?.maritalStatus}</p>
+                    <p>{patient?.emergency?.maritalStatus}</p>
                 </div>
 
                 {/* Registration Info */}
@@ -153,22 +132,22 @@ export default function ViewPatient() {
 
                 <div>
                     <p className="text-gray-900 font-normal">Department</p>
-                    <p>{patients?.registration?.department}</p>
+                    <p>{patient?.registration?.department}</p>
                 </div>
 
                 <div>
                     <p className="text-gray-900 font-normal">Patient Type</p>
-                    <p>{patients?.registration?.patientType}</p>
+                    <p>{patient?.registration?.patientType}</p>
                 </div>
 
                 <div>
                     <p className="text-gray-900 font-normal">Registration Date</p>
-                    <p>{patients?.registration?.registerDate}</p>
+                    <p>{patient?.registration?.registerDate}</p>
                 </div>
 
                 <div>
                     <p className="text-gray-900 font-normal">Doctor Assigned</p>
-                    <p>{patients?.registration?.assignedDoctor}</p>
+                    <p>{patient?.registration?.assignedDoctor}</p>
                 </div>
 
             </div>

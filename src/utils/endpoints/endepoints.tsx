@@ -1,2 +1,8 @@
 export const patients = '/patients'
 export const gender = '/gender'
+export const department = '/department'
+export const country = '/location/countries'
+export const state = '/location/states'
+export const city = '/location/cities'
+export const zipcode = '/location/zipcodes'
+export const patientType = '/patient-type'
