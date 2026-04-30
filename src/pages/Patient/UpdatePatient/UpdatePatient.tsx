@@ -5,9 +5,10 @@ import Input from "../../../components/form/input/InputField.tsx";
 import Select from "../../../components/form/Select.tsx";
 import { EyeCloseIcon, EyeIcon, TimeIcon } from "../../../icons";
 import DatePicker from "../../../components/form/date-picker.tsx";
-import { editPatient, updatePatient, getGender } from '../../../utils/Services/patient.tsx';
+import { editPatient, updatePatient, getGender, getDepartment, getPatientType } from '../../../utils/Services/patient.tsx';
 import { useNavigate, useParams } from 'react-router'
 import ToggleSwitch from '../../../components/form/form-elements/ToggleSwitch.tsx';
+import { useUpdatePatientMutation } from '../../../utils/RTKQuery/Patients/ApiPatients.ts';
 
 type ToggleProps = {
   checked?: boolean;
@@ -33,9 +34,11 @@ export default function UpdatePatient() {
     const [toast, setToast] = useState<{ message: string; type: string } | null>(null);
     const [errors, setErrors] = useState<PatientErrors>({});
     
+    const [updatePatient] = useUpdatePatientMutation();
+    
     const normalize = (val: string) => val?.trim().toLowerCase();
     const navigate = useNavigate()
-    const { id } = useParams()
+    const { id }: any = useParams()
 
     const [patient, setPatient] = useState<any>({
         firstname: "",
@@ -51,9 +54,11 @@ export default function UpdatePatient() {
             alternatePhone: "",
             city: "",
             country: "",
+            state: "",
+            zipcode: "",
             email: "",
             address: "",
-             status: true
+            status: true
         },
 
         medical: {
@@ -80,13 +85,15 @@ export default function UpdatePatient() {
             department: "",
             assignedDoctor: "",
             registerDate: "",
-             status: true
+            status: true
         }
     })
 
 
 
     const [gender, setGender] = useState<any[]>([])
+    const [department, setDepartment] = useState<any[]>([])
+    const [patientType, setPatientType] = useState<any[]>([])
 
 
     const handOnChangeInput = (e: any) => {
@@ -157,6 +164,28 @@ export default function UpdatePatient() {
         }));
     };
 
+     const handleOnDepartmentSelectChange = (value: any) => {
+        setPatient((prev: any) => ({
+            ...prev,
+            registration: {
+                ...prev.registration,
+                department: value.value || value
+            }
+          
+        }));
+    };
+
+    const handleOnPatientTypeSelectChange = (value: any) => {
+        setPatient((prev: any) => ({
+            ...prev,
+            registration: {
+                ...prev.registration,
+                patientType: value.value || value
+            }
+          
+        }));
+    };
+
     const handleOnCitySelectChange = (value: any) => {
         setPatient((prev: any) => ({
             ...prev,
@@ -173,6 +202,26 @@ export default function UpdatePatient() {
             contact: {
                 ...prev.contact,
                 country: value.value || value
+            }
+        }));
+    };
+
+    const handleOnStateSelectChange = (value: any) => {
+        setPatient((prev: any) => ({
+            ...prev,
+            contact: {
+                ...prev.contact,
+                state: value.value || value
+            }
+        }));
+    };
+
+    const handleOnZipCodeSelectChange = (value: any) => {
+        setPatient((prev: any) => ({
+            ...prev,
+            contact: {
+                ...prev.contact,
+                zipcode: value.value || value
             }
         }));
     };
@@ -227,7 +276,7 @@ export default function UpdatePatient() {
 
     const handleOnSubmit = async () => {
         try {
-            if (!validate()) return;
+            // if (!validate()) return;
             const payload = {
                 firstname: patient.firstname,
                 lastname: patient.lastname,
@@ -242,6 +291,8 @@ export default function UpdatePatient() {
                     alternatePhone: patient.contact?.alternatePhone,
                     city: patient.contact?.city,
                     country: patient.contact?.country,
+                    state: patient.contact?.state,
+                    zipcode: patient.contact?.zipcode,
                     email: patient.contact?.email,
                     address: patient.contact?.address,
                     status: patient.status ? true : false
@@ -275,7 +326,7 @@ export default function UpdatePatient() {
                 }
             }
 
-            const res = await updatePatient(id, payload)
+            const res = await updatePatient({ id, body: payload }).unwrap();
 
             setToast({
                 message: res?.data?.message || "Patient updated successfully",
@@ -313,9 +364,25 @@ export default function UpdatePatient() {
         setGender(res.data)
     }
 
+    const fetchDepartment = async () => {
+        const res = await getDepartment()
+        console.log(res.data, 'department');
+    
+        setDepartment(res.data)
+    }
+
+    const fetchPatientType = async () => {
+        const res = await getPatientType()
+        console.log(res.data, 'patient-type');
+    
+        setPatientType(res.data)
+    }
+
 
     useEffect(() => {
         fetchGender()
+        fetchDepartment()
+        fetchPatientType()
     }, [])
 
     // const options: any = [
@@ -326,6 +393,16 @@ export default function UpdatePatient() {
     const options: any = gender?.map((item: any) => ({
         value: item.gender,
         label: item.gender
+    }))
+
+    const depatments = department?.map((item: any) => ({
+        value: item.name,
+        label: item.name
+    }))
+
+    const type = patientType?.map((item: any) => ({
+        value: item.name,
+        label: item.name
     }))
 
     const country = [
@@ -484,7 +561,7 @@ export default function UpdatePatient() {
                     )}
                 </div>
 
-                <div>
+                {/* <div>
                     <Label>Gender</Label>
                     <Select
               
@@ -493,6 +570,28 @@ export default function UpdatePatient() {
                         onChange={handleSelectChange}
                         className="dark:bg-dark-900"
                     />
+                </div> */}
+
+                <div className="mb-3">
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        Gender
+                    </label>
+
+                    <select
+                        value={patient.gender}
+                        onChange={handleSelectChange}
+                        className="w-full h-11 px-3 py-2 border border-gray-300 rounded-md bg-white text-sm shadow-sm 
+                           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                           dark:bg-gray-800 dark:text-white"
+                    >
+                        <option value="">Select Gender</option>
+
+                        {gender.map((g) => (
+                            <option key={g.id} value={g.gender}>
+                                {g.gender}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 <div>
@@ -602,6 +701,28 @@ export default function UpdatePatient() {
                     />
                 </div>
 
+                 <div className='hidden'>
+                    <Label htmlFor="input">State</Label>
+                    <Select
+                      
+                        options={city}
+                        placeholder="Select an State"
+                        onChange={handleOnStateSelectChange}
+                        className="dark:bg-dark-900"
+                    />
+                </div>
+
+                <div className='hidden'>
+                    <Label htmlFor="input">ZipCode</Label>
+                    <Select
+
+                        options={country}
+                        placeholder="Select an Zipcode"
+                        onChange={handleOnZipCodeSelectChange}
+                        className="dark:bg-dark-900"
+                    />
+                </div>
+
                  {/* <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
 
                     <h2 className="text-lg font-medium text-gray-700">
@@ -670,25 +791,64 @@ export default function UpdatePatient() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                <div>
-                    <Label>Patient Type</Label>
-                    {/* <Select
-                        options={[
-                            { label: "New", value: "new" },
-                            { label: "Returning", value: "returning" }
-                        ]}
-                        placeholder="Select Patient Type"
-                        onChange={(val) =>
-                            setPatient({ ...patient, patientType: val.value })
-                        }
+                {/* <div>
+                                    <div>
+                    <Label>PatientType</Label>
+                    <Select
+
+                        options={type}
+                        placeholder="Select an option"
+                        onChange={handleOnPatientTypeSelectChange}
                         className="dark:bg-dark-900"
-                    /> */}
-                    <Input placeholder='Enter a patient type' value={patient?.registration?.patientType || ''} onChange={handleRegistrationChange} name="patientType" type="text" />
+                    />
+                    
+                   
+                </div>
+                   
+                </div> */}
+
+                 <div className="mb-3">
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        Patient Type
+                    </label>
+
+                    <select
+                        value={patient.registration.patientType}
+                        onChange={handleOnPatientTypeSelectChange}
+                        className="w-full h-11 px-3 py-2 border border-gray-300 rounded-md bg-white text-sm shadow-sm 
+                           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                           dark:bg-gray-800 dark:text-white"
+                    >
+                        <option value="">Select Patient Type</option>
+
+                        {patientType.map((pt) => (
+                            <option key={pt.id} value={pt.name}>
+                                {pt.name}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
-                <div>
-                    <Label>Department</Label>
-                    <Input placeholder='Enter a department' value={patient?.registration?.department || ''} name="department" onChange={handleRegistrationChange} type="text" />
+                <div className="mb-3">
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        Department
+                    </label>
+
+                    <select
+                        value={patient.registration.department}
+                        onChange={handleOnDepartmentSelectChange}
+                        className="w-full h-11 px-3 py-2 border border-gray-300 rounded-md bg-white text-sm shadow-sm 
+                           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                           dark:bg-gray-800 dark:text-white"
+                    >
+                        <option value="">Select Department</option>
+
+                        {department.map((d) => (
+                            <option key={d.id} value={d.name}>
+                                {d.name}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 <div>

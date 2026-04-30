@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "../../ui/table";
 import { Link, useParams } from 'react-router'
+import { useGetPatientsQuery, useDeletePatientMutation } from '../../../utils/RTKQuery/Patients/ApiPatients'
 
 import Badge from "../../ui/badge/Badge";
 
@@ -121,62 +122,24 @@ const tableData: Order[] = [
   },
 ];
 
-export default function PatientTable({ search, setSearch }: { search: string, setSearch: any }) {
-  const [data, setData] = useState<any[]>([])
-  const [toast, setToast] = useState<{ message: string; type: string } | null>(null);
+export default function PatientTable({ search }: { search: string, setSearch: any }) {
+   const { data, error, isLoading } = useGetPatientsQuery();
+   const [deletePatient] = useDeletePatientMutation();
+
+  const [toast] = useState<{ message: string; type: string } | null>(null);
+
+  const patients = data?.data || data || [];
+
   const [currentPage, setCurrentPage] = useState(1);
-  // const [sortField, setSortField] = useState<string>('');
-  // const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [pageSize, setPageSize] = useState(5);
-  const [jumpPage, setJumpPage] = useState('');
+  const [pageSize] = useState(5);
 
-  const itemsPerPage = 5;
-
-  // const { id } = useParams()
-
-//   const handleSort = (field: string) => {
-//   if (sortField === field) {
-//     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-//   } else {
-//     setSortField(field);
-//     setSortOrder('asc');
-//   }
-// };
-
-
-
-  const filteredData = data?.filter((patient: any) =>
+  const filteredData = patients.filter((patient: any) =>
     `${patient.firstname} ${patient.lastname}`
       .toLowerCase()
       .includes(search.toLowerCase()) ||
     patient.contact?.phone?.toLowerCase().includes(search.toLowerCase()) ||
     patient.contact?.email?.toLowerCase().includes(search.toLowerCase())
   );
-
-//   const sortedData = [...filteredData].sort((a: any, b: any) => {
-//   if (!sortField) return 0;
-
-//   let aValue = '';
-//   let bValue = '';
-
-//   if (sortField === 'name') {
-//     aValue = `${a.firstname} ${a.lastname}`.toLowerCase();
-//     bValue = `${b.firstname} ${b.lastname}`.toLowerCase();
-//   } else if (sortField === 'phone') {
-//     aValue = a.contact?.phone || '';
-//     bValue = b.contact?.phone || '';
-//   } else if (sortField === 'email') {
-//     aValue = a.contact?.email || '';
-//     bValue = b.contact?.email || '';
-//   } else {
-//     aValue = a[sortField];
-//     bValue = b[sortField];
-//   }
-
-//   if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
-//   if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
-//   return 0;
-// });
 
   const totalPages = Math.ceil(filteredData.length / pageSize);
 
@@ -188,68 +151,30 @@ export default function PatientTable({ search, setSearch }: { search: string, se
   );
 
 
-  const fetchPatient = async () => {
-    try {
-      const res = await getPatient()
-
-      console.log(res.data, 'res.data');
-      const { data, message } = res;
-
-      setData(data);
-
-      if (!data || data.length === 0) {
-        setToast({
-          message: message || "No record found",
-          type: "error",
-        });
-      } else {
-        // setToast({
-        //   message: message || "Patients loaded successfully",
-        //   type: "success",
-        // });
-      }
-
-      setTimeout(() => {
-        setToast(null);
-      }, 3000);
-
-    } catch (error: any) {
-      console.log(error, 'error');
-
-      setToast({
-        message: error?.response?.data?.message || "Something went wrong",
-        type: "error",
-      });
-
-      setTimeout(() => {
-        setToast(null);
-      }, 3000);
-    }
-
-  }
-
-  const deletePatient = async (id: any) => {
+  const handleDelete  = async (id: any) => {
     console.log(id, 'id');
 
     if (window.confirm('Are you sure you want to delete?')) {
-      const res = await deletPatient(id)
+      const res = await deletePatient(id).unwrap()
       console.log(res.data, 'id');
-      setData((prev) => prev.filter((p) => p.id !== id));
     }
 
   }
 
   useEffect(() => {
-    fetchPatient()
     setCurrentPage(1);
   }, [search])
+
+
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error loading data</p>;
+
   return (
     <>
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
         <div className="w-full overflow-x-hidden">
           <div style={{ maxHeight: '350px', overflow: 'scrollY' }}>
             <Table className='w-full table-fixed'>
-              {/* Table Header */}
               <TableHeader className="border-b">
                 <TableRow className='bg-gray-100 dark:bg-gray-800'>
                   <TableCell
@@ -300,7 +225,7 @@ export default function PatientTable({ search, setSearch }: { search: string, se
               {/* Table Body */}
               <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                 {paginatedData && paginatedData.length > 0 ? (
-                  paginatedData.map((patient: any) => (
+                 paginatedData.map((patient: any) => (
                     <TableRow key={patient.id}>
                       <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                         {patient.id}
@@ -337,7 +262,7 @@ export default function PatientTable({ search, setSearch }: { search: string, se
                             </button>
                           </Link>
                           <button
-                            onClick={() => patient.id && deletePatient(patient.id)}
+                            onClick={() => patient.id && handleDelete(patient.id)}
                             className="text-red-500 hover:text-red-700"
                           >
                             <Trash2 size={18} />
@@ -384,12 +309,10 @@ export default function PatientTable({ search, setSearch }: { search: string, se
       </div>
       <div className="flex items-center justify-between mt-1 border border-gray-200 rounded-lg px-4 py-2">
 
-        {/* LEFT INFO */}
         <div className="text-sm text-gray-500">
           Page {currentPage} of {totalPages}
         </div>
 
-        {/* BUTTONS */}
         <div className="flex items-center gap-2">
 
           <button
@@ -424,86 +347,7 @@ export default function PatientTable({ search, setSearch }: { search: string, se
         </div>
 
       </div>
-
-
-      {/* <div className="flex flex-wrap items-center justify-between mt-1 border border-gray-200 rounded-lg px-4 py-2 gap-3">
-
-        <div className="text-sm text-gray-500">
-          Page {currentPage} of {totalPages}
-        </div>
-
-        <div className="flex items-center gap-2 text-sm">
-          <span>Rows:</span>
-          <select
-            value={pageSize}
-            onChange={(e) => {
-              setPageSize(Number(e.target.value));
-              setCurrentPage(1); 
-            }}
-            className="border rounded-md px-2 py-1"
-          >
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-          </select>
-        </div>
-
-        <div className="flex items-center gap-2">
-
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(currentPage - 1)}
-            className="px-3 py-1 border rounded-md disabled:opacity-50"
-          >
-            Prev
-          </button>
-
-          {Array.from({ length: totalPages }, (_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentPage(i + 1)}
-              className={`px-3 py-1 border rounded-md ${currentPage === i + 1 ? "bg-blue-600 text-white" : ""
-                }`}
-            >
-              {i + 1}
-            </button>
-          ))}
-
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(currentPage + 1)}
-            className="px-3 py-1 border rounded-md disabled:opacity-50"
-          >
-            Next
-          </button>
-
-        </div>
-
-        <div className="flex items-center gap-2 text-sm">
-          <span>Go to:</span>
-          <input
-            type="number"
-            min={1}
-            max={totalPages}
-            value={jumpPage}
-            onChange={(e) => setJumpPage(e.target.value)}
-            className="w-16 border rounded-md px-2 py-1"
-          />
-
-          <button
-            onClick={() => {
-              const page = Number(jumpPage);
-              if (page >= 1 && page <= totalPages) {
-                setCurrentPage(page);
-              }
-            }}
-            className="px-2 py-1 border rounded-md bg-gray-100 hover:bg-gray-200"
-          >
-            Go
-          </button>
-        </div>
-
-      </div> */}
+      
       <div
         className={`fixed bottom-10 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-300 ease-in-out
     ${toast

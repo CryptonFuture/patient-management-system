@@ -5,8 +5,11 @@ import Input from "../../../components/form/input/InputField.tsx";
 import Select from "../../../components/form/Select.tsx";
 import { EyeCloseIcon, EyeIcon, TimeIcon } from "../../../icons";
 import DatePicker from "../../../components/form/date-picker.tsx";
-import { addPatient, getGender } from '../../../utils/Services/patient.tsx';
+import { addPatient, getDepartment, getGender, getPatientType } from '../../../utils/Services/patient.tsx';
 import { useNavigate } from 'react-router'
+import {getCountry, getCity, getState, getZipcode} from '../../../utils/Services/location.tsx'
+import { locationData } from '../../../utils/locationData/locationData.tsx';
+import { useAddPatientMutation } from '../../../utils/RTKQuery/Patients/ApiPatients.ts';
 
 type Patient = {
   firstname?: string;
@@ -25,8 +28,33 @@ type PatientErrors = {
 
 export default function AddPatient() {
     const [toast, setToast] = useState<{ message: string; type: string } | null>(null);
+
+    const [addPatient] = useAddPatientMutation();
+    
     const [errors, setErrors] = useState<PatientErrors>({});
     const [gender, setGender] = useState<any[]>([])
+    const [department, setDepartment] = useState<any[]>([])
+    const [patientType, setPatientType] = useState<any[]>([])
+
+    // const [countries, setCountries] = useState([]);
+    // const [states, setStates] = useState([]);
+    // const [cities, setCities] = useState([]);
+    // const [zipcodes, setZipcodes] = useState([]);
+
+    // const [selectedCountry, setSelectedCountry] = useState<any>(null);
+    // const [selectedState, setSelectedState] = useState<any>(null);
+    // const [selectedCity, setSelectedCity] = useState<any>(null);
+    // const [selectedZipcode, setSelectedZipcode] = useState<any>(null);
+
+    const [countries, setCountries] = useState([]);
+    const [states, setStates] = useState([]);
+    const [cities, setCities] = useState([]);
+    const [zipcodes, setZipcodes] = useState([]);
+
+    const [selectedCountry, setSelectedCountry] = useState<any>("");
+    const [selectedState, setSelectedState] = useState<any>("");
+    const [selectedCity, setSelectedCity] = useState<any>("");
+    const [selectedZipcode, setSelectedZipcode] = useState<any>("");
 
     const navigate = useNavigate()
 
@@ -41,6 +69,8 @@ export default function AddPatient() {
         alternatePhone: "",
         city: "",
         country: "",
+        state: "",
+        zipcode: "",
         email: "",
         address: "",
         bloodGroup: "",
@@ -60,21 +90,157 @@ export default function AddPatient() {
         registerDate: ""
     })
 
+    
+
     const handOnChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
         setPatient({ ...patient, [name]: value })
     }
 
-    const handleSelectChange = (value: string) => {
+      const handleSelectDepartmentChange = (value: string) => {
+        setPatient({ ...patient, department: value });
+    };
+
+    const handleSelectChange = (value: any) => {
         setPatient({ ...patient, gender: value });
     };
 
-    const handleOnCitySelectChange = (value: string) => {
-        setPatient({ ...patient, city: value });
+      const handlePatientTypeSelectChange = (value: string) => {
+        setPatient({ ...patient, patientType: value });
     };
 
-    const handleOnCountrySelectChange = (value: string) => {
-        setPatient({ ...patient, country: value });
+  
+    const handleOnCountrySelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+
+        // if (!selected || selected.value == null || isNaN(selected.value)) {
+        //     console.log("Invalid selection");
+        //     return;
+        // }
+
+        // console.log(selected.value, 'selected.value');
+        
+
+        // console.log(selected, 'selected');
+        
+        // setSelectedCountry(selected)
+
+        // setSelectedState(null);
+        // setSelectedCity(null);
+        // setSelectedZipcode(null);
+
+        // setStates([])
+        // setCities([])
+        // setZipcodes([])
+
+        // const countryId = Number(selected.value)
+
+        // if (!countryId || isNaN(countryId)) {
+        //     console.log("Invalid countryId:", countryId);
+        //     return;
+        // }
+
+        // console.log(countryId, 'countryId');
+        
+
+        // const res = await getState(countryId)
+        
+        
+        // const countryData =  res.map((s: any) => ({
+        //     label: s.name,
+        //     value: s.id
+        // }))
+        // setStates(countryData)
+
+        // console.log(countryData, 'stateData');
+        
+        // setPatient({ ...patient, country: value });
+
+        const countryId = Number(e.target.value);
+
+        setSelectedCountry(countryId);
+        setSelectedState("");
+        setSelectedCity("");
+        setSelectedZipcode("");
+
+        const country = locationData.find((c: any) => c.id === countryId);
+
+        setStates(country?.states || []);
+        setCities([]);
+        setZipcodes([]);
+
+    };
+
+    const handleOnStateSelectChange = async (e: any) => {
+        // setSelectedState(selected)
+
+        // setSelectedCity(null);
+        // setSelectedZipcode(null);
+
+        // setCities([])
+        // setZipcodes([])
+
+        // const res = await getCity(selected?.value)
+        
+        // const stateData =  res.map((citi: any) => ({
+        //     label: citi.name,
+        //     value: citi.id
+        // }))
+        // setCities(stateData)
+
+        // console.log(stateData, 'stateData');
+
+        // setPatient({ ...patient, state: value });
+
+        const stateId = Number(e.target.value);
+
+        setSelectedState(stateId);
+        setSelectedCity("");
+        setSelectedZipcode("");
+
+        const country = locationData.find((c: any) => c.id === selectedCountry);
+        const state = country?.states.find((s: any) => s.id === stateId);
+
+        setCities(state?.cities || []);
+        setZipcodes([]);
+    };
+
+      const handleOnCitySelectChange = async (e: any) => {
+        // setSelectedCity(selected)
+
+        // setSelectedZipcode(null);
+
+        // setZipcodes([])
+
+        // const res = await getZipcode(selected?.value)
+        
+        // const cityData =  res.map((z: any) => ({
+        //     label: z.name,
+        //     value: z.id
+        // }))
+        // setZipcodes(cityData)
+
+        // console.log(cityData, 'stateData');
+
+        // setPatient({ ...patient, city: value });
+
+          const cityId = Number(e.target.value);
+
+          setSelectedCity(cityId);
+          setSelectedZipcode("");
+
+          const country = locationData.find((c: any) => c.id === selectedCountry);
+          const state = country?.states.find((s: any) => s.id === selectedState);
+          const city = state?.cities.find((c: any) => c.id === cityId);
+
+          setZipcodes(city?.zipcodes || []);
+    };
+
+
+    const handleOnZipcodeSelectChange = (e: any) => {
+        console.log("Selected Zipcode:", e);
+        // setPatient({ ...patient, zipcode: value });
+        // setSelectedZipcode(selected);
+        setSelectedZipcode(e.target.value);
     };
 
     const validate = (): boolean => {
@@ -104,8 +270,10 @@ export default function AddPatient() {
                 age: patient.age,
                 phone: patient.phone,
                 alternatePhone: patient.alternatePhone,
-                city: patient.city,
-                country: patient.country,
+                city: selectedCity,
+                country: selectedCountry,
+                state: selectedState,
+                zipcode: selectedZipcode,
                 email: patient.email,
                 address: patient.address,
                 bloodGroup: patient.bloodGroup,
@@ -126,7 +294,7 @@ export default function AddPatient() {
 
             }
 
-            const res = await addPatient(payload)
+            const res = await addPatient(payload).unwrap()
 
 
             setToast({
@@ -166,9 +334,42 @@ export default function AddPatient() {
         setGender(res.data)
     }
 
+    const fetchDepartment = async () => {
+        const res = await getDepartment()
+        console.log(res.data, 'department');
+
+        setDepartment(res.data)
+    }
+
+     const fetchPatientType = async () => {
+        const res = await getPatientType()
+        console.log(res.data, 'patient-type');
+
+        setPatientType(res.data)
+    }
+
+    const getCountries = () => {
+        // const res = await getCountry()
+        // const countryData = res.map((c: any) => ({
+        //     label: c.name,
+        //     value: Number(c.id)
+        // }))
+        // console.log(countryData, 'country');
+        
+        // setCountries(countryData)
+
+       
+        setCountries(locationData)
+    }
+
+
+
 
     useEffect(() => {
         fetchGender()
+        fetchDepartment()
+        getCountries()
+        fetchPatientType()
     }, [])
 
     // const options = [
@@ -189,6 +390,16 @@ export default function AddPatient() {
     const options = gender?.map((item: any) => ({
         value: item.gender,
         label: item.gender
+    }))
+
+    const depatments = department?.map((item: any) => ({
+        value: item.name,
+        label: item.name
+    }))
+
+    const type = patientType?.map((item: any) => ({
+        value: item.name,
+        label: item.name
     }))
 
     return (
@@ -241,6 +452,8 @@ export default function AddPatient() {
                         className="dark:bg-dark-900"
                     />
                 </div>
+
+              
 
                 <div>
                     <DatePicker
@@ -332,27 +545,137 @@ export default function AddPatient() {
                     <Input placeholder='Enter a address' name='address' onChange={handOnChangeInput} type="text" id="input" />
                 </div>
 
-                <div>
+                <div className="mb-3">
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        Country
+                    </label>
+                    <div className="relative">
+                        <select 
+                        value={selectedCountry} 
+                        onChange={handleOnCountrySelectChange}
+                        className="w-full h-11 px-3 py-2 pr-10 border border-gray-300 rounded-md bg-white text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                            <option value="">Select Country</option>
+                            {countries.map((c: any) => (
+                                <option key={c.id} value={c.id}>
+                                    {c.name}
+                                </option>
+                            ))}
+                        </select>
+                     
+                    </div>
+                </div>
+
+                <div className="mb-3">
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">State</label>
+                    <div className='relative'>
+                        <select
+                            value={selectedState}
+                            onChange={handleOnStateSelectChange}
+                            disabled={!selectedCountry}
+                            className="w-full h-11 px-3 py-2 pr-10 border border-gray-300 rounded-md bg-white text-sm shadow-sm 
+                            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                            disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+
+                        >
+                        <option value="">Select State</option>
+                            {states.map((s: any) => (
+                                <option key={s.id} value={s.id}>
+                                    {s.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                <div className="mb-1">
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">City</label>
+                    <div className='relative'>
+                        <select
+                            value={selectedCity}
+                            onChange={handleOnCitySelectChange}
+                            disabled={!selectedState}
+                             className="w-full h-11 px-3 py-2 pr-10 border border-gray-300 rounded-md bg-white text-sm shadow-sm 
+                            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                            disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+
+                        >
+                            <option value="">Select City</option>
+                            {cities.map((c: any) => (
+                                <option key={c.id} value={c.id}>
+                                    {c.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                <div className="mb-1">
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Zipcode</label>
+                    <div className='relative'>
+                        <select
+                            value={selectedZipcode}
+                            onChange={handleOnZipcodeSelectChange}
+                            disabled={!selectedCity}
+                             className="w-full h-11 px-3 py-2 pr-10 border border-gray-300 rounded-md bg-white text-sm shadow-sm 
+                            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                            disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+
+                        >
+                            <option value="">Select Zipcode</option>
+                            {zipcodes.map((z, index) => (
+                                <option key={index} value={z}>
+                                    {z}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                {/* <div>
+                    <Label htmlFor="input">Country</Label>
+                    <Select
+
+                        options={countries}
+                        placeholder="Select an Country"
+                        onChange={handleOnCountrySelectChange}
+                        className="dark:bg-dark-900"
+                    />
+                </div>
+
+                 <div>
+                    <Label htmlFor="input">State</Label>
+                    <Select
+
+                        options={states}
+                        placeholder="Select an State"
+                        onChange={handleOnStateSelectChange}
+                        className="dark:bg-dark-900"
+                    />
+                </div>
+                
+
+                 <div>
                     <Label htmlFor="input">City</Label>
                     <Select
 
-                        options={city}
+                        options={cities}
                         placeholder="Select an City"
                         onChange={handleOnCitySelectChange}
                         className="dark:bg-dark-900"
                     />
                 </div>
 
-                <div>
-                    <Label htmlFor="input">Country</Label>
+                 <div>
+                    <Label htmlFor="input">Zipcode</Label>
                     <Select
 
-                        options={country}
-                        placeholder="Select an Country"
-                        onChange={handleOnCountrySelectChange}
+                        options={zipcodes}
+                        placeholder="Select an Zipcode"
+                        onChange={handleOnZipcodeSelectChange}
                         className="dark:bg-dark-900"
                     />
-                </div>
+                </div> */}
 
             </div>
 
@@ -406,7 +729,15 @@ export default function AddPatient() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                 <div>
-                    <Label>Patient Type</Label>
+                    <Label>PatientType</Label>
+                    <Select
+
+                        options={type}
+                        placeholder="Select an option"
+                        onChange={handlePatientTypeSelectChange}
+                        className="dark:bg-dark-900"
+                    />
+                    
                     {/* <Select
                         options={[
                             { label: "New", value: "new" },
@@ -418,12 +749,22 @@ export default function AddPatient() {
                         }
                         className="dark:bg-dark-900"
                     /> */}
-                    <Input placeholder='Enter a patient type' onChange={handOnChangeInput} name="patientType" type="text" />
                 </div>
+
+                {/* <div>
+                    <Label>Department</Label>
+                    <Input placeholder='Enter a department' name="department" onChange={handOnChangeInput} type="text" />
+                </div> */}
 
                 <div>
                     <Label>Department</Label>
-                    <Input placeholder='Enter a department' name="department" onChange={handOnChangeInput} type="text" />
+                    <Select
+
+                        options={depatments}
+                        placeholder="Select an option"
+                        onChange={handleSelectDepartmentChange}
+                        className="dark:bg-dark-900"
+                    />
                 </div>
 
                 <div>
