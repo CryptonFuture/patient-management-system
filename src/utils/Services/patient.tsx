@@ -1,5 +1,5 @@
 import { instance } from "../Axios/axiosConfig";
-import { department, patients, patientType } from "../endpoints/endepoints";
+import { bloodGroup, department, Diseases, patients, patientType } from "../endpoints/endepoints";
 import { gender } from "../endpoints/endepoints";
 
 export const getPatient = async () => {
@@ -44,5 +44,15 @@ export const getDepartment = async () => {
 
 export const getPatientType = async () => {
     const res = await instance.get(`${patientType}`)
+    return res.data
+}
+
+export const getBloodGroup = async () => {
+    const res = await instance.get(`${bloodGroup}`)
+    return res.data
+}
+
+export const getDiseases = async () => {
+    const res = await instance.get(`${Diseases}`)
     return res.data
 }

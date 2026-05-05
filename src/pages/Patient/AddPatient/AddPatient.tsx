@@ -5,7 +5,7 @@ import Input from "../../../components/form/input/InputField.tsx";
 import Select from "../../../components/form/Select.tsx";
 import { EyeCloseIcon, EyeIcon, TimeIcon } from "../../../icons";
 import DatePicker from "../../../components/form/date-picker.tsx";
-import { addPatient, getDepartment, getGender, getPatientType } from '../../../utils/Services/patient.tsx';
+import { addPatient, getBloodGroup, getDepartment, getDiseases, getGender, getPatientType } from '../../../utils/Services/patient.tsx';
 import { useNavigate } from 'react-router'
 import {getCountry, getCity, getState, getZipcode} from '../../../utils/Services/location.tsx'
 import { locationData } from '../../../utils/locationData/locationData.tsx';
@@ -35,6 +35,8 @@ export default function AddPatient() {
     const [gender, setGender] = useState<any[]>([])
     const [department, setDepartment] = useState<any[]>([])
     const [patientType, setPatientType] = useState<any[]>([])
+    const [bloodGroup, setBloodGroup] = useState<any[]>([])
+    const [Diseases, setDiseases] = useState<any[]>([])
 
     // const [countries, setCountries] = useState([]);
     // const [states, setStates] = useState([]);
@@ -97,8 +99,16 @@ export default function AddPatient() {
         setPatient({ ...patient, [name]: value })
     }
 
-      const handleSelectDepartmentChange = (value: string) => {
+    const handleSelectDepartmentChange = (value: string) => {
         setPatient({ ...patient, department: value });
+    };
+
+    const handleSelectBloodGroupChange = (value: string) => {
+        setPatient({ ...patient, bloodGroup: value });
+    };
+
+    const handleSelectDiseasesChange = (value: string) => {
+        setPatient({ ...patient, diseases: value });
     };
 
     const handleSelectChange = (value: any) => {
@@ -341,11 +351,25 @@ export default function AddPatient() {
         setDepartment(res.data)
     }
 
-     const fetchPatientType = async () => {
+    const fetchPatientType = async () => {
         const res = await getPatientType()
         console.log(res.data, 'patient-type');
 
         setPatientType(res.data)
+    }
+
+    const fetchBloodGroup = async () => {
+        const res = await getBloodGroup()
+        console.log(res.data, 'blood-group');
+
+        setBloodGroup(res.data)
+    }
+
+    const fetchDiseases = async () => {
+        const res = await getDiseases()
+        console.log(res.data, 'diseases');
+
+        setDiseases(res.data)
     }
 
     const getCountries = () => {
@@ -370,6 +394,8 @@ export default function AddPatient() {
         fetchDepartment()
         getCountries()
         fetchPatientType()
+        fetchBloodGroup()
+        fetchDiseases()
     }, [])
 
     // const options = [
@@ -398,6 +424,16 @@ export default function AddPatient() {
     }))
 
     const type = patientType?.map((item: any) => ({
+        value: item.name,
+        label: item.name
+    }))
+
+    const blood = bloodGroup?.map((item: any) => ({
+        value: item.name,
+        label: item.name
+    }))
+
+      const diseases = Diseases?.map((item: any) => ({
         value: item.name,
         label: item.name
     }))
@@ -684,10 +720,14 @@ export default function AddPatient() {
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
                 <div>
                     <Label>Blood Group</Label>
-                    <Input placeholder='Enter a blood group' onChange={handOnChangeInput} name="bloodGroup" type="text" />
+                    <Select
+                        options={blood}
+                        placeholder="Select an option"
+                        onChange={handleSelectBloodGroupChange}
+                        className="dark:bg-dark-900"
+                    />
                 </div>
 
                 <div>
@@ -707,7 +747,12 @@ export default function AddPatient() {
 
                 <div>
                     <Label>Chronic Diseases</Label>
-                    <Input placeholder='Enter a diseases' onChange={handOnChangeInput} name="diseases" type="text" />
+                    <Select
+                        options={diseases}
+                        placeholder="Select an option"
+                        onChange={handleSelectDiseasesChange}
+                        className="dark:bg-dark-900"
+                    />
                 </div>
 
                 <div>
@@ -857,7 +902,7 @@ export default function AddPatient() {
             {toast && (
                 <div
                     className={`fixed bottom-10 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg text-white transition-all
-                ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}
+                    ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}
                 >
                     {toast.message}
                 </div>
