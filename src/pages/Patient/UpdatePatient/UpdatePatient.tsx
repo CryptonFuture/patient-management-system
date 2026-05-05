@@ -5,7 +5,7 @@ import Input from "../../../components/form/input/InputField.tsx";
 import Select from "../../../components/form/Select.tsx";
 import { EyeCloseIcon, EyeIcon, TimeIcon } from "../../../icons";
 import DatePicker from "../../../components/form/date-picker.tsx";
-import { editPatient, updatePatient, getGender, getDepartment, getPatientType } from '../../../utils/Services/patient.tsx';
+import { editPatient, updatePatient, getGender, getDepartment, getPatientType, getBloodGroup, getDiseases } from '../../../utils/Services/patient.tsx';
 import { useNavigate, useParams } from 'react-router'
 import ToggleSwitch from '../../../components/form/form-elements/ToggleSwitch.tsx';
 import { useUpdatePatientMutation } from '../../../utils/RTKQuery/Patients/ApiPatients.ts';
@@ -94,6 +94,8 @@ export default function UpdatePatient() {
     const [gender, setGender] = useState<any[]>([])
     const [department, setDepartment] = useState<any[]>([])
     const [patientType, setPatientType] = useState<any[]>([])
+    const [bloodGroup, setBloodGroup] = useState<any[]>([])
+    const [Diseases, setDiseases] = useState<any[]>([])
 
 
     const handOnChangeInput = (e: any) => {
@@ -170,6 +172,18 @@ export default function UpdatePatient() {
             registration: {
                 ...prev.registration,
                 department: value.value || value
+            }
+          
+        }));
+    };
+
+
+       const handleOnBloodGroupSelectChange = (value: any) => {
+        setPatient((prev: any) => ({
+            ...prev,
+            medical: {
+                ...prev.medical,
+                bloodGroup: value.value || value
             }
           
         }));
@@ -378,11 +392,27 @@ export default function UpdatePatient() {
         setPatientType(res.data)
     }
 
+    const fetchBloodGroup = async () => {
+        const res = await getBloodGroup()
+        console.log(res.data, 'blood-group');
+
+        setBloodGroup(res.data)
+    }
+
+    const fetchDiseases = async () => {
+        const res = await getDiseases()
+        console.log(res.data, 'diseases');
+
+        setDiseases(res.data)
+    }
+
 
     useEffect(() => {
         fetchGender()
         fetchDepartment()
         fetchPatientType()
+        fetchBloodGroup()
+        fetchDiseases()
     }, [])
 
     // const options: any = [
@@ -748,10 +778,30 @@ export default function UpdatePatient() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                <div>
-                    <Label>Blood Group</Label>
-                    <Input placeholder='Enter a blood group' value={patient?.medical?.bloodGroup || ''} onChange={handleMedicalChange} name="bloodGroup" type="text" />
+                <div className="mb-3">
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        Blood Group
+                    </label>
+
+                    <select
+                        value={patient.medical.bloodGroup}
+                        onChange={handleOnBloodGroupSelectChange}
+                        className="w-full h-11 px-3 py-2 border border-gray-300 rounded-md bg-white text-sm shadow-sm 
+                           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                           dark:bg-gray-800 dark:text-white"
+                    >
+                        <option value="">Select Blood Group</option>
+
+                        {bloodGroup.map((bg) => (
+                            <option key={bg.id} value={bg.name}>
+                                {bg.name}
+                            </option>
+                        ))}
+                    </select>
                 </div>
+
+
+               
 
                 <div>
                     <Label>Height (cm)</Label>
